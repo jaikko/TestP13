@@ -1,0 +1,83 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+    - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run:
+          name: "Setting environment vars for test env"
+          command: |
+            echo "export SENTRY_DSN=${SENTRY_DSN}" >> ${BASH_ENV}
+            echo "export SECRET_KEY=${SECRET_KEY}" >> ${BASH_ENV}
+            echo "export ALLOWED_HOSTS=${ALLOWED_HOSTS}" >> ${BASH_ENV}
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          name: Setup env and install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "venv"
+      - run:
+          name: Running tests
+          command: |
+            . venv/bin/activate
+            pytest
+  build_and_push:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and push Docker image to Docker Hub
+          command: |
+            TAG=${CIRCLE_SHA1:0:10}
+            SENTRY_DSN=${SENTRY_DSN}
+            docker build \
+            -t ${DOCKER_HUB_USERNAME}/${HEROKU_APP_NAME}:$TAG \
+            --build-arg SENTRY_DSN=${SENTRY_DSN} \
+            --build-arg SECRET_KEY=${SECRET_KEY} \
+            --build-arg ALLOWED_HOSTS=${ALLOWED_HOSTS} \
+            --build-arg DEBUG=${DEBUG} .
+            echo $DOCKER_HUB_PASSWORD | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin
+            docker push ${DOCKER_HUB_USERNAME}/${HEROKU_APP_NAME}:$TAG
+  deploy:
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Deploy on Heroku
+          command: |
+            sudo curl https://cli-assets.heroku.com/install.sh | sh
+            echo $DOCKER_HUB_PASSWORD | docker login -u ${DOCKER_HUB_USERNAME} --password-stdin
+            docker pull ${DOCKER_HUB_USERNAME}/${HEROKU_APP_NAME}:${CIRCLE_SHA1:0:10}
+            heroku container:login
+            docker tag ${DOCKER_HUB_USERNAME}/${HEROKU_APP_NAME}:${CIRCLE_SHA1:0:10} registry.heroku.com/${HEROKU_APP_NAME}/web
+            docker push registry.heroku.com/${HEROKU_APP_NAME}/web
+            heroku container:release web -a ${HEROKU_APP_NAME}
+            
+workflows:
+  heroku_deploy:
+    jobs:
+      - test
+      - build_and_push:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
+      - deploy:
+          requires:
+            - build_and_push
+          filters:
+            branches:
+              only: master
