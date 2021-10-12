@@ -75,3 +75,43 @@ Utilisation de PowerShell, comme ci-dessus sauf :
 
 - Pour activer l'environnement virtuel, `.\venv\Scripts\Activate.ps1` 
 - Remplacer `which <my-command>` par `(Get-Command <my-command>).Path`
+
+### Deploiement
+
+Il est nécessaire d’installer docker, avoir un compte DockerHub, Heroku, Sentry, et CircleCI.
+
+Heroku :
+
+-	Créer une nouvelle application 
+-	Dans « Account settings », récupérer ou générer votre « API key »
+-	Garder cette valeur car on en aura besoin plus tard
+
+Sentry :
+
+-	Sur le site, cliquer sur `Projects` , `Create Project`  ensuite  `Django`
+-	Créer votre projet en appuyant sur `Create Project`
+-	Récupérer la valeur dans `dsn=` et garder la pour plus tard  
+
+CircleCI :
+
+1. Sur le site CircleCI, se rendre sur `Projects` et cliquer sur `Set Up Project` avec le projet concerné
+2. Choisissez la deuxième option et entrez `master` si besoin comme nom de branche puis `Let’s go`
+3. Cliquer sur `Projects Settings` , ensuite `Environment Variables` et pour terminer `Add Environment Varibale` 
+4. Ajouter les variables d’environnement suivantes et compléter les :
+  -	`ALLOWED_HOSTS` : url de votre application Heroku ( ex : app-name.herokuapp.com)
+  -	`DEBUG` : False
+  -	`DOCKER_HUB_PASSWORD` : mot de passe votre compte DockerHub
+  -	`DOCKER_HUB_USERNAME` : pseudo votre compte DockerHub
+  -	`HEROKU_API_KEY` : valeur récupérer dans la partie Heroku
+  -	`HEROKU_APP_NAME` : Nom de l’application créé préalablement
+  -	`HEROKU_LOGIN` : email de votre compte Heroku
+  -	`SECRET_KEY` : créer votre clé secrète ou générer la ici
+  -	`SENTRY_DSN` : valeur récupérer dans la partie Sentry
+5. Relancer le workflow 
+
+### Docker
+Il faut préalablement lancer installer Docker.
+
+1. Lancer une invite de commande en tant qu’administateur
+2. Remplacer les variables `docker_hub_username`, `heroku_app_name` et `tags` qui correspond aux tags de votre image crée ( à récupérer dans `Images` puis `Remote repositores`) dans la commande ci-dessous
+3. Executer la commande suivante : docker run -dp 80:8000/tcp `docker_hub_username`/`heroku_app_name`:`tags` 
