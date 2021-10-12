@@ -39,7 +39,6 @@ jobs:
           name: Build and push Docker image to Docker Hub
           command: |
             TAG=${CIRCLE_SHA1:0:10}
-            SENTRY_DSN=${SENTRY_DSN}
             docker build \
             -t ${DOCKER_HUB_USERNAME}/${HEROKU_APP_NAME}:$TAG \
             --build-arg SENTRY_DSN=${SENTRY_DSN} \
