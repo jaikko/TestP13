@@ -113,6 +113,6 @@ CircleCI :
 Il faut préalablement lancer installer Docker.
 
 1. Lancer une invite de commande en tant qu’administateur
-2. Remplacer les variables `docker_hub_username`, `heroku_app_name` et `tags` qui correspond aux tags de votre image crée ( à récupérer dans `Images` puis `Remote repositories`) dans la commande ci-dessous
-3. Exécuter la commande suivante : docker run -dp 80:8000/tcp `docker_hub_username`/`heroku_app_name`:`tags` 
+2. Remplacer les variables `container_name`, `docker_hub_username`, `heroku_app_name` et `tags` qui correspond aux tags de votre image crée ( à récupérer dans `Images` puis `Remote repositories`) dans la commande ci-dessous
+3. Exécuter la commande suivante : docker run --name `container_name` -dp 80:8000/tcp `docker_hub_username`/`heroku_app_name`:`tags` 
 4. Aller sur `http://localhost/`
