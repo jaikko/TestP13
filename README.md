@@ -105,7 +105,7 @@ CircleCI :
   -	`HEROKU_API_KEY` : valeur récupérer dans la partie Heroku
   -	`HEROKU_APP_NAME` : Nom de l’application créé préalablement
   -	`HEROKU_LOGIN` : email de votre compte Heroku
-  -	`SECRET_KEY` : créer votre clé secrète ou générer la ici
+  -	`SECRET_KEY` : créer votre clé secrète ou générer la [ici](https://djecrety.ir/)
   -	`SENTRY_DSN` : valeur récupérer dans la partie Sentry
 5. Relancer le workflow 
 
