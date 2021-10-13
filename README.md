@@ -110,7 +110,7 @@ CircleCI :
 5. Relancer le workflow 
 
 ### Docker
-Il faut préalablement lancer installer Docker.
+Il faut préalablement installer Docker.
 
 1. Lancer une invite de commande en tant qu’administateur
 2. Remplacer les variables `container_name`, `docker_hub_username`, `heroku_app_name` et `tags` qui correspond aux tags de votre image crée ( à récupérer dans `Images` puis `Remote repositories`) dans la commande ci-dessous
